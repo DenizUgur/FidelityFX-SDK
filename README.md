@@ -1,19 +1,42 @@
-# Welcome to Detached FSR/DLSS Framework
+# TransparentSR: Decoupling Video Upscaling from Rendering for Cloud Gaming
 
-This repository showcases a [sample](./samples/fsr/) implementation of the Detached FSR/DLSS Framework. It is possible to run the sample without detaching the upscaler as well. You can access the documentation for the individual methods used below:
+## Overview of TransparentSR
 
--   [FSR (FidelityFX SDK)](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/55ff22bb6981a9b9c087b9465101769fc0acd447/readme.md)
--   [DLSS (Streamline SDK)](https://github.com/NVIDIAGameWorks/Streamline/blob/c709dd9874e21dea100d6e2f2e109d16b87b8b55/README.md)
+TransparentSR is a library that enables decoupling video upscalers (aka super-resolution (SR) models) from game renderers, which allows utilizing various upscalers with games _without_ changing their source code.
 
-## TransparentSR
+The following figure presents a high-level illustration of TransparentSR.
 
-Although there are [many changes](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/compare/release-FSR3-3.0.4...DenizUgur:Detached-FSR-DLSS:fsr-dlss-remote) in this repository, the key feature is encapsulated in the [`TransparentSR`](framework/cauldron/framework/libs/tsr/) library. This library is responsible for managing the detachment of resources needed for upscaling. It can be used with any upscaler, not just FSR or DLSS.
+<p align="center">
+    <img height="300" src="./assets/overview.png" />
+</p>
 
-## How to build the sample
+The details of TransparentSR are published in the following paper:
 
-Building the sample is exactly the same as building the FidelityFX SDK. You can find the instructions [here](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/release-FSR3-3.0.4/docs/getting-started/building-samples.md). Be sure to build "Native-backed DLL" version.
+-   Deniz Ugur, Ihab Amer, and Mohamed Hefeeda, **Decoupling Video Upscaling from Rendering for Cloud Gaming**, In Proc. of ACM Multimedia Systems (MMSys'25) Conference, Stellenbosch, South Africa, March 2025.
 
-To build our modified sample you should follow these instructions:
+The **abstract** of the paper is below:
+
+Many recent video games require powerful hardware to render them. To reduce such high hardware requirements, upscalers have been proposed in the literature and industry. Upscalers save computing resources by first rendering games at lower resolutions and frame rates and then upscaling them to improve players’ quality of experience. Current upscalers, however, are tightly coupled with the rendering logic of video games, which requires updating the source code of each game for every upscaler. This increases the development cost and limits the use of upscalers. The tight coupling also stifles the deployment of upscalers in cloud gaming platforms to reduce the required computing resources. We propose decoupling upscalers from game renderers, which allows utilizing various upscalers with games without changing their source code. It also accelerates deploying upscalers in cloud gaming. Decoupling upscalers from renderers is, however, challenging because of the diversity of upscalers, their dependency on information at different rendering stages, and the strict timing requirements of video games. We present an efficient solution that addresses these challenges. We implement the proposed solution and demonstrate its effectiveness with two popular upscalers. We also develop a cloud gaming system in the emerging Media-over-QUIC (MoQ) protocol and implement the proposed approach with it. Our experiments show the potential savings in computing resources while meeting the strict timing constraints of video games.
+
+## Implementation of TransparentSR
+
+This repository started as a fork of the [FidelityFX SDK](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK). Its main highlight is the [`TransparentSR`](framework/cauldron/framework/libs/tsr/) library, which manages the detachment of resources required for upscaling. It can be used with any upscaler, not just FSR or DLSS.
+
+Although there are [many changes](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/compare/release-FSR3-3.0.4...DenizUgur:Detached-FSR-DLSS:fsr-dlss-remote) in this repository, most of them pertain to the Cauldron Framework. These changes introduce new APIs that provide the functionality needed for TransparentSR to operate.
+
+To get started with TransparentSR, check out its source code in the [`framework/cauldron/framework/libs/tsr/`](framework/cauldron/framework/libs/tsr/) directory. Additionally, you can explore the sample render module that utilizes TransparentSR in the [`samples/fsr/tsrrendermodule.cpp`](samples/fsr/tsrrendermodule.cpp) file.
+
+## Sample Upscalers: AMD FSR and NVIDIA DLSS
+
+TransparentSR can easily support various video upscalers. To demonstrate its functionality, we have tested it with two of the most widely deployed upscalers: AMD FSR and NVIDIA DLSS.
+
+## Building and Testing Sample Upscalers
+
+This repository showcases a [sample](./samples/fsr/) that utilizes TransparentSR. It is possible to run the sample without detaching the upscaler as well.
+
+### How to build the sample
+
+To build the sample follow these instructions:
 
 1. Install the following software developer tool minimum versions:
 
@@ -40,13 +63,13 @@ Also be sure to download media files using the following command:
 
 > More information about this tool can be found [here](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/release-FSR3-3.0.4/docs/tools/media-delivery.md).
 
-## A note on the sample
+### A note on the sample
 
 Detaching the upscaler from the rendering process requires both process to be in sync. To account for scheduling issues and not to drop any rendered frames, both processes will wait for each other to fill/empty the resource pool. The resource pool is a static pool of 10 buffers. Each buffer has enough space for all the required resources for both FSR and DLSS to function.
 
 > It is possible to optimize this aspect by using a dynamic resource pool. This will allow the upscaler to run at a different rate than the renderer. However, at this time this sample is no more than a proof of concept.
 
-## How to run the sample
+### How to run the sample
 
 Since we deploy two seperate processes for the upscaling and rendering, it becomes difficult to run it within the Visual Studio IDE. We recommend building the solution and the use the helper CLI tool ([governor](./governor.py)) to run the sample.
 
@@ -67,9 +90,18 @@ python governor.py --render-res 1285 835 --upscaler FSR3 --use-default
 python governor.py --render-res 1285 835 --upscaler FSR3 --skip-upscaler # This will skip launching the upscaler
 ```
 
-## Streaming
+## Current Approaches for Integrating Upscalers with Video Games
 
-Streaming of the upscaled content is done using [Media-over-QUIC](https://datatracker.ietf.org/group/moq/about/). The sample and the governor script can be configured to stream the upscaled content locally. This is done by setting the `--stream` flag in the governor script.
+Current approaches in the literature and industry require changing the source code of each game for every single upscaler, which is unlike TransparentSR, which reduces integration efforts and costs by transparently supporting various upscalers with minimal/no changes in the game source code.
+
+For example, the following sites explain the detailed (and different) integration steps of two common upscalers:
+
+-   [FSR (FidelityFX SDK)](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/55ff22bb6981a9b9c087b9465101769fc0acd447/readme.md)
+-   [DLSS (Streamline SDK)](https://github.com/NVIDIAGameWorks/Streamline/blob/c709dd9874e21dea100d6e2f2e109d16b87b8b55/README.md)
+
+## Evaluation in Cloud Gaming
+
+TransparentSR is evaluated in a cloud gaming system that is built on the emerging Media-over-QUIC (MoQ) protocol. The system uses the [Media-over-QUIC (MoQ)](https://datatracker.ietf.org/group/moq/about/) protocol for streaming the upscaled content. The sample and the governor script can be configured to stream the upscaled content locally. This is done by setting the `--stream` flag in the governor script.
 
 ### Prerequisites
 
