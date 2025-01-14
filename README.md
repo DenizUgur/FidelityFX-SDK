@@ -26,17 +26,16 @@ Although there are [many changes](https://github.com/GPUOpen-LibrariesAndSDKs/Fi
 
 To get started with TransparentSR, check out its source code in the [`framework/cauldron/framework/libs/tsr/`](framework/cauldron/framework/libs/tsr/) directory. Additionally, you can explore the sample render module that utilizes TransparentSR in the [`samples/fsr/tsrrendermodule.cpp`](samples/fsr/tsrrendermodule.cpp) file.
 
-## Sample Upscalers: AMD FSR and NVIDIA DLSS
-
-TransparentSR can easily support various video upscalers. To demonstrate its functionality, we have tested it with two of the most widely deployed upscalers: AMD FSR and NVIDIA DLSS.
 
 ## Building and Testing Sample Upscalers
+
+TransparentSR can easily support various video upscalers. To demonstrate its functionality, we have tested it with two of the most widely deployed upscalers: AMD FSR and NVIDIA DLSS.
 
 This repository showcases a [sample](./samples/fsr/) that utilizes TransparentSR. It is possible to run the sample without detaching the upscaler as well.
 
 ### How to build the sample
 
-To build the sample follow these instructions:
+To build the sample, follow these instructions:
 
 1. Install the following software developer tool minimum versions:
 
