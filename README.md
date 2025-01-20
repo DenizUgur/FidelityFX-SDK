@@ -52,7 +52,7 @@ To build the sample, follow these instructions:
 > <installation path>\BuildFSRSolutionNativeDll.bat
 ```
 
-This will generate a `build\` directory where you will find the solution for either the native-backend-backed SDK samples (`FidelityFX SDK Native.sln`).
+This will generate a `build\` directory where you will find the solution for either the native-backend-backed SDK samples (`FidelityFX SDK Native.sln`). Launch the solution with Visual Studio and build the project using `ReleaseDX12` configuration.
 
 Also be sure to download media files using the following command:
 

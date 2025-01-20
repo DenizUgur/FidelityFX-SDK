@@ -357,7 +357,7 @@ def parse_args():
     parser.add_argument(
         "--use-release-build",
         action="store_true",
-        default=False,
+        default=True,
         help="Use the release build of FidelityFX FSR",
     )
     parser.add_argument(
