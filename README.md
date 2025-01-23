@@ -41,6 +41,7 @@ The sample must be compiled and run on a Windows machine. Make sure that you hav
 -   [Vulkan SDK 1.4.304.0](https://vulkan.lunarg.com/sdk/home)
 -   [CMake 3.17](https://cmake.org/download/)
 
+> [!IMPORTANT]
 > In order to test DLSS 3 (Frame Generation), you need at least 40-series NVIDIA GPU.
 
 To install the dependencies, you can follow two different approaches:
@@ -86,18 +87,23 @@ cd TransparentSR
 
 This will generate a `build\` directory where you will find the solution for the SDK (`FidelityFX Native SDK.sln`). Launch the solution with Visual Studio and build the project using `ReleaseDX12` configuration.
 
+> [!IMPORTANT]
+> If you encounter an error regarding a missing `ffx_backend_dx12_x64.dll` file, modify a file under `framework\cauldron\framework\src\render\dx12` and rebuild the solution.
+
 Also be sure to download the media files using the following command:
 
 ```bash
 .\UpdateMedia.bat
 ```
 
+> [!NOTE]
 > More information about this script can be found [here](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/release-FSR3-3.0.4/docs/tools/media-delivery.md).
 
 ### A note on the sample
 
 Detaching the upscaler from the rendering process requires both process to be in sync. To account for scheduling issues and not to drop any rendered frames, both processes will wait for each other to fill/empty the resource pool. The resource pool is a static pool of 10 buffers. Each buffer has enough space for all the required resources for both FSR and DLSS to function.
 
+> [!NOTE]
 > It is possible to optimize this aspect by using a dynamic resource pool. This will allow the upscaler to run at a different rate than the renderer. However, at this time this sample is no more than a proof of concept.
 
 ### Prerequisites for running the sample
@@ -176,6 +182,7 @@ The sample's configuration must be set to stream the content. Please refer to th
 python governor.py --render-res 1285 835 --upscaler FSR3 --stream
 ```
 
+> [!NOTE]
 > There's no restriction on which parameters can be used with the `--stream` flag.
 
 ### Viewing the stream
@@ -196,4 +203,5 @@ https://quic.video/watch/live?server=localhost:4443
 
 and view the stream.
 
-> Warning: If you encounter TLS errors, please make sure to run the `SetupMOQ.bat` script again.
+> [!WARNING]
+> If you encounter TLS errors, please make sure to run the `SetupMOQ.bat` script again.
