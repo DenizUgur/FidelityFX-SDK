@@ -1,0 +1,5 @@
+numpy
+pyautogui
+matplotlib
+scikit-image
+pywin32; platform_system == "Windows"

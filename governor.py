@@ -500,7 +500,7 @@ def main(opts):
             print(f"Relay PID: {relay.pid}")
 
         web = subprocess.Popen(
-            ["npm", "start"],
+            ["npm", "run", "preview"],
             shell=True,
             cwd=os.path.join(SCRIPT_DIR, "demo"),
             stdout=subprocess.DEVNULL,

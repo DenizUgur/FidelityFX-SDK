@@ -26,47 +26,100 @@ Although there are [many changes](https://github.com/GPUOpen-LibrariesAndSDKs/Fi
 
 To get started with TransparentSR, check out its source code in the [`framework/cauldron/framework/libs/tsr/`](framework/cauldron/framework/libs/tsr/) directory. Additionally, you can explore the sample render module that utilizes TransparentSR in the [`samples/fsr/tsrrendermodule.cpp`](samples/fsr/tsrrendermodule.cpp) file.
 
-
 ## Building and Testing Sample Upscalers
 
 TransparentSR can easily support various video upscalers. To demonstrate its functionality, we have tested it with two of the most widely deployed upscalers: AMD FSR and NVIDIA DLSS.
 
 This repository showcases a [sample](./samples/fsr/) that utilizes TransparentSR. It is possible to run the sample without detaching the upscaler as well.
 
+### Prerequisites for building the sample
+
+The sample must be compiled and run on a Windows machine. Make sure that you have installed your GPU's drivers and the following dependencies:
+
+-   [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/)
+-   [Windows 10 SDK 10.0.19041.0](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk)
+-   [CMake 3.17](https://cmake.org/download/)
+
+> In order to test DLSS 3 (Frame Generation), you need at least 40-series NVIDIA GPU.
+
+To install the dependencies, you can follow two different approaches:
+
+#### Using Chocolatey (recommended)
+
+1. Install [Chocolatey](https://chocolatey.org/install) package manager.
+2. Run the following commands to install the dependencies:
+
+```bash
+# For Visual Studio + Windows 10 SDK
+choco install visualstudio2022community visualstudio2022-workload-nativedesktop -y
+# For CMake
+choco install cmake -y
+```
+
+#### Manually
+
+1. Install [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/).
+2. Launch Visual Studio Installer and install the following components:
+    - Desktop development with C++
+    - Windows 10 SDK (10.0.19041.0)
+3. Install [CMake 3.17](https://cmake.org/download/).
+
 ### How to build the sample
 
-To build the sample, follow these instructions:
-
-1. Install the following software developer tool minimum versions:
-
--   [CMake 3.17](https://cmake.org/download/)
--   [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/)
--   [Windows 10 SDK 10.0.18362.0](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk)
--   [Vulkan SDK 1.3.239](https://vulkan.lunarg.com/) (Not used in the sample, but required for the FidelityFX SDK)
-
-2. Generate Visual Studio FSR sample solutions:
-
-**Native-backend DLL version**
+1. Clone the repository:
 
 ```bash
-> <installation path>\BuildFSRSolutionNativeDll.bat
+git clone https://github.com/DenizUgur/TransparentSR
+cd TransparentSR
 ```
 
-This will generate a `build\` directory where you will find the solution for either the native-backend-backed SDK samples (`FidelityFX SDK Native.sln`). Launch the solution with Visual Studio and build the project using `ReleaseDX12` configuration.
-
-Also be sure to download media files using the following command:
+2. Generate the Visual Studio solution:
 
 ```bash
-> <installation path>\UpdateMedia.bat
+.\GenerateVisualStudioSolution.bat
 ```
 
-> More information about this tool can be found [here](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/release-FSR3-3.0.4/docs/tools/media-delivery.md).
+This will generate a `build\` directory where you will find the solution for the SDK (`FidelityFX Native SDK.sln`). Launch the solution with Visual Studio and build the project using `ReleaseDX12` configuration.
+
+Also be sure to download the media files using the following command:
+
+```bash
+.\UpdateMedia.bat
+```
+
+> More information about this script can be found [here](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/release-FSR3-3.0.4/docs/tools/media-delivery.md).
 
 ### A note on the sample
 
 Detaching the upscaler from the rendering process requires both process to be in sync. To account for scheduling issues and not to drop any rendered frames, both processes will wait for each other to fill/empty the resource pool. The resource pool is a static pool of 10 buffers. Each buffer has enough space for all the required resources for both FSR and DLSS to function.
 
 > It is possible to optimize this aspect by using a dynamic resource pool. This will allow the upscaler to run at a different rate than the renderer. However, at this time this sample is no more than a proof of concept.
+
+### Prerequisites for running the sample
+
+The version numbers are the ones used during the development of the sample. It is possible to use newer versions of the software.
+
+-   [Python](https://www.python.org/downloads/) (3.12.6)
+-   [Node.js](https://nodejs.org/en/download/) (22.8.0) (for cloud gaming)
+-   [Rust](https://www.rust-lang.org/tools/install) (1.81.0) (for cloud gaming)
+-   [Go](https://go.dev/dl/) (1.23.1) (for cloud gaming)
+-   [Clang](https://chocolatey.org/packages/llvm) (18.1.8) (for cloud gaming)
+-   [FFmpeg](https://ffmpeg.org/download.html) (7.0.2) (for cloud gaming)
+
+#### Installation with Chocolatey (recommended)
+
+1. Install [Chocolatey](https://chocolatey.org/install).
+2. Run the following commands to install the dependencies:
+
+```bash
+chocho install python nodejs rust go llvm ffmpeg -y
+```
+
+#### Install the Python dependencies
+
+```bash
+pip install -r requirements.txt
+```
 
 ### How to run the sample
 
@@ -102,15 +155,6 @@ For example, the following sites explain the detailed (and different) integratio
 
 TransparentSR is evaluated in a cloud gaming system that is built on the emerging Media-over-QUIC (MoQ) protocol. The system uses the [Media-over-QUIC (MoQ)](https://datatracker.ietf.org/group/moq/about/) protocol for streaming the upscaled content. The sample and the governor script can be configured to stream the upscaled content locally. This is done by setting the `--stream` flag in the governor script.
 
-### Prerequisites
-
-The version numbers are the ones used during the development of the sample. It is possible to use newer versions of the software.
-
--   [Rust](https://www.rust-lang.org/tools/install) (1.81.0)
--   [Go](https://go.dev/dl/) (1.23.1)
--   [Clang](https://chocolatey.org/packages/llvm) (18.1.8)
--   [FFmpeg](https://ffmpeg.org/download.html) (7.0.2)
-
 ### Setup
 
 Run the convenience script to setup the MOQ server:
@@ -131,13 +175,13 @@ python governor.py --render-res 1285 835 --upscaler FSR3 --stream
 
 ### Viewing the stream
 
-This repository includes a simple web page to view the stream. Checkout the `demo/` directory and run the following command:
+This repository includes a simple web page to view the stream. Checkout the `demo/` directory. This server will be launched if you use the `--stream` flag in the governor script.
+
+You can visit the following URL to view the stream:
 
 ```bash
-npm run preview
+https://localhost:3000
 ```
-
-> This server will be launched if you use the `--stream` flag in the governor script.
 
 Or if you want to quickly verify the stream, you can visit the following URL:
 
