@@ -38,6 +38,7 @@ The sample must be compiled and run on a Windows machine. Make sure that you hav
 
 -   [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/)
 -   [Windows 10 SDK 10.0.19041.0](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk)
+-   [Vulkan SDK 1.4.304.0](https://vulkan.lunarg.com/sdk/home)
 -   [CMake 3.17](https://cmake.org/download/)
 
 > In order to test DLSS 3 (Frame Generation), you need at least 40-series NVIDIA GPU.
@@ -63,6 +64,10 @@ choco install cmake -y
     - Desktop development with C++
     - Windows 10 SDK (10.0.19041.0)
 3. Install [CMake 3.17](https://cmake.org/download/).
+
+#### Install the Vulkan SDK
+
+Regardless of the installation method, you need to install the Vulkan SDK manually. Download the [Vulkan SDK 1.4.304.0](https://vulkan.lunarg.com/sdk/home) and install it. It's not used in the sample, but it's required by the FidelityFX SDK.
 
 ### How to build the sample
 

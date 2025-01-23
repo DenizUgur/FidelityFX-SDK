@@ -24,7 +24,7 @@ call BuildFidelityFXSDK.bat -DFFX_BUILD_AS_DLL=1
 cd ..
 
 echo.
-echo Building FSR sample solution
+echo Building sample solution
 echo.
 
 :: Check directories exist and create if not
